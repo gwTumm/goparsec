@@ -149,10 +149,13 @@ func (ast *AST) OrdChoice(nm string, cb ASTNodify, ps ...interface{}) Parser {
 				fmsg := "while parsing %vth for %q: %v"
 				panic(fmt.Errorf(fmsg, i+1, nm, err))
 			} else if n != nil {
-				q := ast.docallback(nm, cb, news, n.(Queryable))
+				nt := ast.getnt(nm)
+				nt.Children = []Queryable{n.(Queryable)}
+				q := ast.docallback(nm, cb, news, nt)
 				if q != nil {
 					return ast.trydebug(q, news, "OrdChoice", nm, i+1, true)
 				}
+				ast.putnt(nt)
 				return ast.trydebug(nil, s, "OrdChoice", nm, i+1, "skip")
 			}
 		}
